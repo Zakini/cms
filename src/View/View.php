@@ -3,10 +3,11 @@
 namespace Statamic\View;
 
 use Facades\Statamic\View\Cascade;
+use Illuminate\Contracts\View\View as ViewContract;
 use Statamic\Support\Str;
 use Statamic\View\Events\ViewRendered;
 
-class View
+class View extends ViewContract
 {
     protected $data = [];
     protected $layout;
@@ -21,9 +22,13 @@ class View
         return $view;
     }
 
-    public function with($data)
+    public function with($key, $value = null)
     {
-        $this->data = $data;
+        if (is_array($key)) {
+            $this->data = array_merge($this->data, $key);
+        } else {
+            $this->data[$key] = $value;
+        }
 
         return $this;
     }
@@ -31,6 +36,11 @@ class View
     public function data()
     {
         return $this->data;
+    }
+
+    public function getData()
+    {
+        return $this->data();
     }
 
     public function gatherData()
@@ -58,6 +68,11 @@ class View
         $this->template = $template;
 
         return $this;
+    }
+
+    public function name()
+    {
+        return $this->template();
     }
 
     public function render(): string
